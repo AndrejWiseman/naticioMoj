@@ -1,40 +1,39 @@
-import type { GatsbyConfig, PluginRef } from "gatsby"
-import "dotenv/config"
+import { GatsbyConfig } from 'gatsby';
+import 'dotenv/config';
 
-const shouldAnalyseBundle = process.env.ANALYSE_BUNDLE
+const shouldAnalyseBundle = process.env.ANALYSE_BUNDLE === 'true';
+
+type PluginRef = {
+  resolve: string;
+  options: any;
+};
 
 const config: GatsbyConfig = {
   siteMetadata: {
-    // You can overwrite values here that are used for the SEO component
-    // You can also add new values here to query them like usual
-    // See all options: https://github.com/LekoArts/gatsby-themes/blob/main/themes/gatsby-theme-cara/gatsby-config.mjs
-    siteTitle: `Cara`,
-    siteTitleAlt: `Cara - Gatsby Starter Portfolio`,
-    siteHeadline: `Cara - Gatsby Theme from @lekoarts`,
+    siteTitle: `Nati`,
+    siteTitleAlt: `Naticio moj`,
+    siteHeadline: `Nati`,
     siteUrl: `https://cara.lekoarts.de`,
-    siteDescription: `Playful and Colorful One-Page portfolio featuring Parallax effects and animations`,
+    siteDescription: `Samo za moj nati`,
     siteImage: `/banner.jpg`,
     siteLanguage: `en`,
     author: `@lekoarts_de`,
   },
-  trailingSlash: `always`,
+  // Postavka trailingSlash kako bi se dodao trailing slash na kraju svakog URL-a
+  trailingSlash: 'always',
   plugins: [
     {
       resolve: `@lekoarts/gatsby-theme-cara`,
-      // See the theme's README for all available options
       options: {},
     },
     {
       resolve: `gatsby-plugin-manifest`,
       options: {
-        name: `Cara - @lekoarts/gatsby-theme-cara`,
-        short_name: `Cara`,
-        description: `Playful and Colorful One-Page portfolio featuring Parallax effects and animations`,
+        name: `Nati moj`,
+        short_name: `Nati`,
+        description: `Nati moj`,
         start_url: `/`,
         background_color: `#141821`,
-        // This will impact how browsers show your PWA/website
-        // https://css-tricks.com/meta-theme-color-and-trickery/
-        // theme_color: `#f6ad55`,
         display: `standalone`,
         icons: [
           {
@@ -50,16 +49,21 @@ const config: GatsbyConfig = {
         ],
       },
     },
-    // You can remove this plugin if you don't need it
-    shouldAnalyseBundle && {
-      resolve: `gatsby-plugin-webpack-statoscope`,
-      options: {
-        saveReportTo: `${__dirname}/public/.statoscope/_bundle.html`,
-        saveStatsTo: `${__dirname}/public/.statoscope/_stats.json`,
-        open: false,
-      },
-    },
-  ].filter(Boolean) as Array<PluginRef>,
-}
+    // Conditionally add plugin based on shouldAnalyseBundle
+    ...(shouldAnalyseBundle
+        ? [
+          {
+            resolve: `gatsby-plugin-webpack-bundle-analyzer`,
+            options: {
+              analyzerPort: 3000,
+              production: true,
+              disable: !shouldAnalyseBundle,
+            },
+          },
+        ]
+        : []),
+  ],
+};
 
-export default config
+export default config;
+
